@@ -1,0 +1,51 @@
+bool findSum(vector<pair<int,int> > v, int sum, bool arr[]) {
+	int i=0;j=n-1, k;
+	while(i<=j) {
+		k=v[i].first + v[j].first;
+		if (k == sum) {
+			arr[i]=true;
+			arr[j]=true;
+			break;
+		}
+		else if (k > sum) {
+			i++;
+		} else {
+			j--;
+		}
+	}
+};
+
+void main() {
+	int t, n, x,i,j,sum;
+	cin>>t>>n;
+	for(k=0;k<t;k++) {
+		pair<int,int> p[n];
+		map<int,int>m;
+		vector<pair<int,int> > v;
+		for(i=0;i<n;i++) {
+			cin>>salary>>sum;
+			v.push_back(make_pair(salary, sum));
+		}
+		if (n==1) return v[0].first;
+		sort(v.begin(),v.end());
+		for (int i = 0; i < n; ++i)
+		{
+			pair<int,int>p =v[i];
+			m[p.first] = i;
+		}
+		bool arr[n];
+		memset(arr, 0, sizeof(n));
+		for(i=0;i<n;i++) {
+			if (v[i].second != 0) {
+				findSum(v, v[i].second, arr);
+			} 
+		}
+		vector<int>supposedCEOSalary;
+		for(i=0;i<n;i++) {
+			if (!arr[i]) {
+				cout<<v[i].first<<" "; 
+			}
+		}
+		cout<<endl;
+	}
+}

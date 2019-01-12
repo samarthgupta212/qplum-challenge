@@ -1,0 +1,144 @@
+
+
+struct Node {
+	struct Node *left, *right;
+	int val;
+	Node(x): val(x),left(NULL),right(NULL) {};
+};
+
+struct Node *root;
+
+void searcHelper(struct Node *root, int x, int *k) {
+	if (!root) return;
+	if (root->val > x) {
+		return searcHelper(root->left, x);
+	} else if (root -> val < x) {
+		return searcHelper(root->right, x);
+	}
+	*k++;
+};
+
+bool search(int x) {
+	int k=0;
+	searcHelper(root, x, &k);
+	if (k > 0) return true;
+	return false;
+}
+
+struct Node *insertHelper (struct Node *temp, int x) {
+	if (!temp) {
+		temp = new Node(x);
+		return temp;
+	}
+	if (temp->val > x) {
+		return insertHelper(temp->left, x);
+	}
+	return insertHelper(temp->right, x);
+};
+
+bool rotateRight = false, rotateLeft = false;
+int checkHeight (struct Node *temp, struct Node **temp1) {
+	if (!temp) return 0;
+	int x = checkHeight(temp->left, temp1);
+	int y = checkHeight(temp->right, temp1);
+	if (abs(x - y) > 1) {
+		*temp1 = temp;
+		if (x > y) rotateRight=true;
+		else rotateLeft = true;
+	}
+	return max(x,y) + 1;
+};
+
+void findParent(struct Node *root, struct Node **parent, struct Node *temp) {
+	if (!root) return;
+	if (root == temp) {
+		*parent = root;
+		return;
+	}
+	findParent(root->left, temp);
+	findParent(root->right, temp);
+}
+
+void balanceTree(struct Node **parent) {
+	struct Node *temp1;
+	struct Node *temp2;
+
+	if (rotateRight) {
+		if (!(*parent)) {
+			temp1 = root;
+			temp2 = root->left;
+			temp2 = root;
+		} else {
+			temp1 = (*parent) -> left;
+			temp2 = (*parent) ->left ->left;
+			(*parent) ->left = temp2;
+		}
+		temp2 -> right = temp1;
+	} else {
+		if (!(*parent)) {
+			temp1 = root;
+			temp2 = root->right;
+			temp2 = root;
+		} else {
+			temp1 = (*parent) -> right;
+			temp2 = (*parent) ->right ->right;
+			(*parent) ->right = temp2;
+		}
+		temp2 -> right = temp1;
+	}
+}
+
+void insert(int x) {
+	insertHelper(root, x);
+	int k = 0;
+
+	struct Node ** temp1 = NULL, **parent = NULL;
+	checkHeight(root, &k, &temp1);
+
+	if (!(*temp1)) {
+		findParent(root, &parent, &temp1);
+		balanceTree(&parent);
+	}
+}
+
+struct Node *findLeastInRightSubTree(struct Node *root) {
+	while(root->left) {
+		root = root->left;
+	}
+	return root;
+}
+struct Node* deleteHelper (struct Node *root, int x, int *k) {
+	if (!root) return NULL;
+	if (root->val > x) {
+		return deleteHelper(root->left, x, k);
+	} else if (root -> val < x) {
+		return deleteHelper(root->right, x, k);
+	}
+	*k++;
+	else {
+		if (root->left == NULL && root->right == NULL) {
+			struct Node *temp = root;
+			free(root);
+			return root;
+		} else if (root->left == NULL) {
+			struct Node *temp = root->right;
+			free(root);
+			return temp;
+		} else if (root->right == NULL) {
+			struct Node *temp = root->left;
+			free(root);
+			return temp;
+		} else {
+			struct Node *pre = findLeastInRightSubTree(root->right);
+			root->val = pre ->val;
+			return deleteHelper(root->right, pre->val, k);
+		}
+	}
+};
+
+bool delete() {
+	int k=0;
+	deleteHelper(root, x, &k);
+	if (k > 0) return true;
+	return false;
+}
